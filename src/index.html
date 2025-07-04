@@ -41,14 +41,10 @@
       <button type="button" class="popup__close"></button>
       <h3 class="popup__title">Редактировать профиль</h3>
       <form class="popup__form" name="edit-profile" novalidate>
-        <label class="popup__field">
-        <input type="text" id="name" name="name" class="popup__input popup__input_type_name" placeholder="Имя" required minlength="2" maxlength="40" pattern="^[a-zA-Zа-яА-ЯёЁ\- ]+$" data-error="Разрешены только буквы, пробелы и дефисы">
+        <input type="text" id="name" name="name" class="popup__input popup__input_type_name" placeholder="Имя" required minlength="2" maxlength="40" pattern="^[a-zA-Zа-яА-ЯёЁ\- ]+$" data-error-required="Заполните имя" data-error-pattern="Разрешены только буквы, пробел и дефис" data-error-length="Имя должно быть от 2 до 40 символов">
         <span class="popup__error" id="name-error">Заполните это поле</span>
-        </label>
-        <label class="popup__field">
-        <input type="text" id="description" name="description" class="popup__input popup__input_type_description" placeholder="Занятие" required minlength="2" maxlength="200">
+        <input type="text" id="description" name="description" class="popup__input popup__input_type_description" placeholder="Занятие" required minlength="2" maxlength="200" pattern="^[a-zA-Zа-яА-ЯёЁ\- ]+$" data-error-required="Заполните описание" data-error-pattern="Разрешены только буквы, пробел и дефис" data-error-length="Описание должно быть от 2 до 200 символов">
         <span class="popup__error" id="description-error">Заполните это поле</span>
-        </label>
         <button type="submit" class="button popup__button">Сохранить</button>
       </form>
     </div>
@@ -58,14 +54,10 @@
       <button type="button" class="popup__close"></button>
       <h3 class="popup__title">Новое место</h3>
       <form class="popup__form" name="new-place" novalidate>
-        <label class="popup__field">
-        <input type="text" id="place-name" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" required data-error="Разрешены только буквы, пробелы и дефисы" minlength="2" maxlength="30" pattern="^[a-zA-Zа-яА-ЯёЁ\- ]+$">
+        <input type="text" id="place-name" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" required minlength="2" maxlength="30" pattern="^[a-zA-Zа-яА-ЯёЁ\- ]+$" data-error-required="Заполните название" data-error-pattern="Разрешены только буквы, пробел и дефис" data-error-length="Название должно быть от 1 до 30 символов">
         <span class="popup__error" id="place-name-error">Заполните это поле</span>
-        </label>
-        <label class="popup__field">
-        <input type="url" id="link" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required>
+        <input type="url" id="link" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required data-error-required="Заполните ссылку" data-error-type="Введите корректный URL">
         <span class="popup__error" id="link-error">Заполните это поле</span>
-        </label>
         <button type="submit" class="button popup__button">Сохранить</button>
       </form>
     </div>
@@ -82,10 +74,8 @@
       <button type="button" class="popup__close"></button>
       <h3 class="popup__title">Обновить аватар</h3>
       <form class="popup__form" name="update-avatar" novalidate>
-        <label class="popup__field">
-        <input type="url" id="avatar" name="avatar" class="popup__input popup__input_type_avatar" placeholder="Ссылка на аватар" required>
+        <input type="url" id="avatar" name="avatar" class="popup__input popup__input_type_avatar" placeholder="Ссылка на аватар" required data-error-required="Введите ссылку на аватар" data-error-type="Введите корректный URL">
         <span class="popup__error" id="avatar-error"></span>
-        </label>
         <button type="submit" class="button popup__button">Сохранить</button>
       </form>
     </div>

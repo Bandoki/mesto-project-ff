@@ -1,109 +1,97 @@
 export { enableValidation, clearValidation };
 
-function showInputError(input, config) {
-  const errorElement = document.getElementById(`${input.id}-error`);
-  input.classList.add(config.inputErrorClass);
-  errorElement.textContent = input.validationMessage;
+function showInputError(inputElement, config) {
+  const errorElement = inputElement
+    .closest('form')
+    .querySelector(`#${inputElement.id}-error`);
+
+  inputElement.classList.add(config.inputErrorClass);
+  errorElement.textContent = inputElement.validationMessage;
   errorElement.classList.add(config.errorClass);
 }
 
-function hideInputError(input, config) {
-  const errorElement = document.getElementById(`${input.id}-error`);
-  input.classList.remove(config.inputErrorClass);
+function hideInputError(inputElement, config) {
+  const errorElement = inputElement
+    .closest('form')
+    .querySelector(`#${inputElement.id}-error`);
+
+  inputElement.classList.remove(config.inputErrorClass);
   errorElement.textContent = '';
   errorElement.classList.remove(config.errorClass);
 }
 
-function setCustomValidation(input) {
-  input.setCustomValidity(''); 
+function setCustomValidation(inputElement) {
+  // Сбрасываем старую ошибку
+  inputElement.setCustomValidity('');
 
-  const value = input.value.trim();
-
-  if (input.type === 'url') {
-    try {
-      new URL(value); 
-    } catch {
-      input.setCustomValidity('Введите корректный URL');
-    }
-  }
-
-  if (input.name === 'name' || input.name === 'about' || input.name === 'place-name') {
-    const nameRegex = /^[a-zA-Zа-яА-ЯёЁ\s\-]+$/;
-
-    if (!nameRegex.test(value)) {
-      input.setCustomValidity('Разрешены только буквы, пробел и дефис');
-    } else {
-      const min = input.getAttribute('minlength');
-      const max = input.getAttribute('maxlength');
-      if (min && value.length < min) {
-        input.setCustomValidity(`Минимум ${min} символа`);
-      }
-      if (max && value.length > max) {
-        input.setCustomValidity(`Максимум ${max} символов`);
-      }
-    }
-  }
-}
-
-function checkInputValidity(input, config) {
-  setCustomValidation(input); 
-
-  if (!input.validity.valid) {
-    showInputError(input, config);
+  if (inputElement.validity.patternMismatch) {
+    inputElement.setCustomValidity(inputElement.dataset.errorPattern || 'Неверный формат');
+  } else if (inputElement.validity.typeMismatch) {
+    inputElement.setCustomValidity(inputElement.dataset.errorType || 'Неверный тип данных');
+  } else if (inputElement.validity.tooShort || inputElement.validity.tooLong) {
+    inputElement.setCustomValidity(inputElement.dataset.errorLength || 'Некорректная длина');
+  } else if (inputElement.validity.valueMissing) {
+    inputElement.setCustomValidity(inputElement.dataset.errorRequired || 'Заполните это поле');
+  } else if (inputElement.validity.badInput) {
+    inputElement.setCustomValidity(inputElement.dataset.errorBadInput || 'Некорректное значение');
   } else {
-    hideInputError(input, config);
+    // Если ошибок нет — сбрасываем
+    inputElement.setCustomValidity('');
   }
 }
 
-function toggleButtonState(inputs, button, config) {
-  const hasInvalid = inputs.some((input) => {
-    setCustomValidation(input);
-    return !input.validity.valid;
-  });
+function checkInputValidity(inputElement, config) {
+  setCustomValidation(inputElement);
 
-  if (hasInvalid) {
-    disableButton(button, config);
+  if (!inputElement.validity.valid) {
+    showInputError(inputElement, config);
   } else {
-    enableButton(button, config);
+    hideInputError(inputElement, config);
   }
 }
 
-function disableButton(button, config) {
-  button.classList.add(config.inactiveButtonClass);
-  button.disabled = true;
+function hasInvalidInput(inputList) {
+  return inputList.some((inputElement) => !inputElement.validity.valid);
 }
 
-function enableButton(button, config) {
-  button.classList.remove(config.inactiveButtonClass);
-  button.disabled = false;
+function toggleButtonState(inputList, buttonElement, config) {
+  if (hasInvalidInput(inputList)) {
+    buttonElement.classList.add(config.inactiveButtonClass);
+    buttonElement.disabled = true;
+  } else {
+    buttonElement.classList.remove(config.inactiveButtonClass);
+    buttonElement.disabled = false;
+  }
 }
 
 function enableValidation(config) {
-  const forms = Array.from(document.querySelectorAll(config.formSelector));
+  const formList = Array.from(document.querySelectorAll(config.formSelector));
 
-  forms.forEach((form) => {
-    const inputs = Array.from(form.querySelectorAll(config.inputSelector));
-    const button = form.querySelector(config.submitButtonSelector);
+  formList.forEach((formElement) => {
+    const inputList = Array.from(formElement.querySelectorAll(config.inputSelector));
+    const buttonElement = formElement.querySelector(config.submitButtonSelector);
 
-    inputs.forEach((input) => {
-      input.addEventListener('input', () => {
-        checkInputValidity(input, config);
-        toggleButtonState(inputs, button, config);
+    formElement.addEventListener('submit', (evt) => evt.preventDefault());
+
+    inputList.forEach((inputElement) => {
+      inputElement.addEventListener('input', () => {
+        checkInputValidity(inputElement, config);
+        toggleButtonState(inputList, buttonElement, config);
       });
     });
 
-    toggleButtonState(inputs, button, config);
+    toggleButtonState(inputList, buttonElement, config);
   });
 }
 
-function clearValidation(form, config) {
-  const inputs = Array.from(form.querySelectorAll(config.inputSelector));
-  const button = form.querySelector(config.submitButtonSelector);
+function clearValidation(formElement, config) {
+  const inputList = Array.from(formElement.querySelectorAll(config.inputSelector));
+  const buttonElement = formElement.querySelector(config.submitButtonSelector);
 
-  inputs.forEach((input) => {
-    input.setCustomValidity('');
-    hideInputError(input, config);
+  inputList.forEach((inputElement) => {
+    inputElement.setCustomValidity('');
+    hideInputError(inputElement, config);
   });
 
-  disableButton(button, config);
+  toggleButtonState(inputList, buttonElement, config);
 }
